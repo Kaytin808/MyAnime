@@ -1,0 +1,97 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+i {
+  color: red;
+  
+}
+header {
+  background-color: #333;
+  color: #fff;
+  padding: 20px;
+}
+
+h1 {
+  margin: 0;
+}
+h2 {
+  text-align: center;
+  
+}
+
+.search-container {
+  margin-top: 20px;
+}
+
+.search-container input {
+  padding: 8px;
+  width: 200px;
+}
+
+.search-container button {
+  padding: 8px 16px;
+  background-color: #4CAF50;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+main {
+  padding: 20px;
+}
+
+.animeCard {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  position: relative;
+}
+
+.animeCard img {
+  width: 100%;
+  max-width: 200px;
+  height: auto;
+  margin-top: 10px;
+}
+
+.animeCard .select-episode-btn {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  padding: 8px 16px;
+  background-color: #4CAF50;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.animeCard .episode-dropdown {
+  display: none;
+  position: absolute;
+  top: 40px;
+  left: 10px;
+  z-index: 1;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+
+.animeCard .episode-dropdown a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.animeCard:hover .episode-dropdown {
+  display: block;
+}
+
+#playerContainer {
+  margin-top: 20px;
+}
