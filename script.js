@@ -32,15 +32,22 @@ function displayAnimeResults(animeData) {
     var listItem = document.createElement('li');
     listItem.className = 'box';
     listItem.innerHTML = `
-      <strong>${anime.title}</strong>
-      <br>
-      <img src="${anime.image}" alt="${anime.title}" style="max-width: 200px;">
-      <br>
-      <strong>Release Date:</strong> ${anime.releaseDate || 'N/A'}
-      <br>
-      <strong>Sub/Dub:</strong> ${anime.subOrDub === 'sub' ? 'Subbed' : 'Dubbed'}
-      <br>
-      <button onclick="showEpisodeGuide('${anime.id}')">Watch Now🥷👍</button>
+      <div class="content">
+        <strong>${anime.title}</strong>
+        <br>
+        <img src="${anime.image}" alt="${anime.title}" style="max-width: 200px;">
+        <br>
+        <strong>Release Date:</strong> ${anime.releaseDate || 'N/A'}
+        <br>
+        <strong>Sub/Dub:</strong> ${anime.subOrDub === 'sub' ? 'Subbed' : 'Dubbed'}
+        <br>
+        <button onclick="showEpisodeGuide('${anime.id}')" class="button is-primary is-rounded">
+          <span class="icon">
+            <i class="fas fa-play"></i>
+          </span>
+          <span>Watch Now</span>
+        </button>
+      </div>
     `;
 
     animeList.appendChild(listItem);
@@ -62,19 +69,41 @@ function showEpisodeGuide(animeId) {
 
 function displayEpisodeGuide(animeData) {
   var episodeGuide = document.createElement('div');
+  episodeGuide.className = 'episode-guide';
+
   episodeGuide.innerHTML = `
-    <h3>${animeData.title}</h3>
-    <img src="${animeData.image}" alt="${animeData.title}" style="max-width: 200px;">
-    <p>${animeData.description || 'No description available.'}</p>
-    <h4>Episode Guide:</h4>
-    <div id="episodeListContainer" class="episode-list-container">
-      <select id="episodeSelect">
-        ${animeData.episodes.map(episode => `<option value="${episode.id}">Episode ${episode.number}</option>`).join('')}
-      </select>
-      <button onclick="playSelectedEpisode()">Play</button>
+    <div class="anime-info">
+      <h3 class="title">${animeData.title}</h3>
+      <img src="${animeData.image}" alt="${animeData.title}" style="max-width: 200px;">
     </div>
-    <div class="video-player" style="display: none;">
-      <video id="player" controls class="video"></video>
+    <div class="anime-description-container">
+      <div class="anime-description collapsed">
+        <p>${animeData.description || 'No description available.'}</p>
+        <button onclick="toggleDescription()" class="button is-small is-rounded">Show More</button>
+      </div>
+    </div>
+    <div class="episode-guide-content">
+      <h4>Episode Guide:</h4>
+      <div class="field has-addons">
+        <div class="control is-expanded">
+          <div class="select">
+            <select id="episodeSelect">
+              ${animeData.episodes.map(episode => `<option value="${episode.id}">Episode ${episode.number}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <div class="control">
+          <button class="button is-primary" onclick="playSelectedEpisode()">
+            <span class="icon">
+              <i class="fas fa-play"></i>
+            </span>
+            <span>Play</span>
+          </button>
+        </div>
+      </div>
+      <div class="video-player" style="display: none;">
+        <video id="player" controls class="video"></video>
+      </div>
     </div>
   `;
 
@@ -82,35 +111,17 @@ function displayEpisodeGuide(animeData) {
   animeList.innerHTML = '';
   animeList.appendChild(episodeGuide);
 }
+function toggleDescription() {
+  var descriptionContainer = document.querySelector('.anime-description');
+  var showMoreButton = document.querySelector('.anime-description button');
 
-function playSelectedEpisode() {
-  var selectElement = document.getElementById('episodeSelect');
-  var selectedEpisodeId = selectElement.value;
-
-  var apiUrl = `https://api.consumet.org/anime/gogoanime/watch/${selectedEpisodeId}?server=gogocdn`;
-
-  fetch(apiUrl)
-    .then(response => response.json())
-    .then(data => {
-      console.log('Episode Response:', data); // Log the response data
-      var episodeUrl = data.sources[0].url;
-      var videoPlayer = document.getElementById('player');
-      videoPlayer.src = episodeUrl;
-      videoPlayer.load();
-      videoPlayer.play(); // Play the episode
-
-      // Request fullscreen
-      if (videoPlayer.requestFullscreen) {
-        videoPlayer.requestFullscreen();
-      } else if (videoPlayer.mozRequestFullScreen) {
-        videoPlayer.mozRequestFullScreen();
-      } else if (videoPlayer.webkitRequestFullscreen) {
-        videoPlayer.webkitRequestFullscreen();
-      } else if (videoPlayer.msRequestFullscreen) {
-        videoPlayer.msRequestFullscreen();
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-    });
+  if (descriptionContainer.classList.contains('collapsed')) {
+    descriptionContainer.classList.remove('collapsed');
+    showMoreButton.textContent = 'Show Less';
+    descriptionContainer.style.maxHeight = 'none'; // Set max-height to none
+  } else {
+    descriptionContainer.classList.add('collapsed');
+    showMoreButton.remove(); // Remove the "Show More" button
+    descriptionContainer.style.maxHeight = '100px'; // Set max-height to the desired collapsed height
+  }
 }

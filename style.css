@@ -3,22 +3,15 @@ body {
   margin: 0;
   padding: 0;
 }
-i {
-  color: red;
-  
-}
+
 header {
   background-color: #333;
-  color: #fff;
+  color: #5c5c5c;
   padding: 20px;
 }
 
 h1 {
   margin: 0;
-}
-h2 {
-  text-align: center;
-  
 }
 
 .search-container {
@@ -94,4 +87,32 @@ main {
 
 #playerContainer {
   margin-top: 20px;
+}
+.anime-description {
+  max-height: 80px;
+  overflow: hidden;
+   transition: max-height 0.3s ease;
+}
+
+.anime-description.collapsed {
+  max-height: none;
+}
+
+.button.is-small.is-rounded {
+  margin-top: 20px;
+}
+.anime-description.collapsed p {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* Adjust the number of lines to show by changing this value */
+  -webkit-box-orient: vertical;
+}
+
+.anime-description.expanded p {
+  -webkit-line-clamp: initial;
+}
+.episode-guide-content{
+  margin-bottom: 10px;
+  
 }
