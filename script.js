@@ -117,10 +117,12 @@ function playSelectedEpisode(animeId) {
   // Save last episode selected
   markEpisodeAsWatched(animeId, selectedEpisodeId);
 
-  // Add the check mark to the selected option
+  // Add the check mark to the selected option only if it is not already watched
   var selectedOption = selectElement.options[selectElement.selectedIndex];
-  selectedOption.text = '✓ ' + selectedOption.text;
-  selectedOption.classList.add('watched');
+  if (!selectedOption.classList.contains('watched')) {
+    selectedOption.text = '✓ ' + selectedOption.text;
+    selectedOption.classList.add('watched');
+  }
 
   var apiUrl = `https://api.consumet.org/anime/gogoanime/watch/${selectedEpisodeId}?server=gogocdn`;
 
