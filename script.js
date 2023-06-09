@@ -73,13 +73,17 @@ function displayEpisodeGuide(animeData) {
     <p>${animeData.description || 'No description available.'}</p>
     <h4>Episode Guide:</h4>
     <div id="episodeListContainer" class="episode-list-container">
-  <div class="select">
-    <select id="episodeSelect">
-      ${animeData.episodes.map(episode => `<option value="${episode.id}">Episode ${episode.number}</option>`).join('')}
-    </select>
-  </div>
-  <button class="button is-primary" onclick="playSelectedEpisode()">Play</button>
-</div>
+      <div class="select">
+        <select id="episodeSelect">
+          ${animeData.episodes.map(episode => {
+            const watchedClass = isEpisodeWatched(animeData.id, episode.id) ? 'watched' : '';
+            const checkMark = isEpisodeWatched(animeData.id, episode.id) ? '✓ ' : '';
+            return `<option value="${episode.id}" class="${watchedClass}">${checkMark}Episode ${episode.number}</option>`;
+          }).join('')}
+        </select>
+      </div>
+      <button class="button is-primary" onclick="playSelectedEpisode('${animeData.id}')">Play</button>
+    </div>
     <div class="video-player" style="display: none;">
       <video id="player" controls class="video"></video>
     </div>
@@ -90,9 +94,33 @@ function displayEpisodeGuide(animeData) {
   animeList.appendChild(episodeGuide);
 }
 
-function playSelectedEpisode() {
+function isEpisodeWatched(animeId, episodeId) {
+  var watchedEpisodes = JSON.parse(localStorage.getItem('watchedEpisodes')) || {};
+  return watchedEpisodes[animeId]?.includes(episodeId);
+}
+
+function markEpisodeAsWatched(animeId, episodeId) {
+  var watchedEpisodes = JSON.parse(localStorage.getItem('watchedEpisodes')) || {};
+  if (!watchedEpisodes[animeId]) {
+    watchedEpisodes[animeId] = [];
+  }
+  if (!watchedEpisodes[animeId].includes(episodeId)) {
+    watchedEpisodes[animeId].push(episodeId);
+    localStorage.setItem('watchedEpisodes', JSON.stringify(watchedEpisodes));
+  }
+}
+
+function playSelectedEpisode(animeId) {
   var selectElement = document.getElementById('episodeSelect');
   var selectedEpisodeId = selectElement.value;
+
+  // Save last episode selected
+  markEpisodeAsWatched(animeId, selectedEpisodeId);
+
+  // Add the check mark to the selected option
+  var selectedOption = selectElement.options[selectElement.selectedIndex];
+  selectedOption.text = '✓ ' + selectedOption.text;
+  selectedOption.classList.add('watched');
 
   var apiUrl = `https://api.consumet.org/anime/gogoanime/watch/${selectedEpisodeId}?server=gogocdn`;
 
