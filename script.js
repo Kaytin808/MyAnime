@@ -1,3 +1,7 @@
+function returnToIndex() {
+  window.location.href = 'index.html';
+}
+
 function searchAnime() {
   var searchInput = document.getElementById('searchInput').value;
 
@@ -68,24 +72,28 @@ function showEpisodeGuide(animeId) {
 function displayEpisodeGuide(animeData) {
   var episodeGuide = document.createElement('div');
   episodeGuide.innerHTML = `
-    <h3>${animeData.title}</h3>
-    <img src="${animeData.image}" alt="${animeData.title}" style="max-width: 200px;">
-    <p>${animeData.description || 'No description available.'}</p>
-    <h4>Episode Guide:</h4>
-    <div id="episodeListContainer" class="episode-list-container">
-      <div class="select">
-        <select id="episodeSelect">
-          ${animeData.episodes.map(episode => {
-    const watchedClass = isEpisodeWatched(animeData.id, episode.id) ? 'watched' : '';
-    const checkMark = isEpisodeWatched(animeData.id, episode.id) ? '✓ ' : '';
-    return `<option value="${episode.id}" class="${watchedClass}">${checkMark}Episode ${episode.number}</option>`;
-  }).join('')}
-        </select>
+    <div class="card">
+      <div class="card-content">
+        <h3 class="title">${animeData.title}</h3>
+        <img src="${animeData.image}" alt="${animeData.title}" style="max-width: 200px;">
+        <p>${animeData.description || 'No description available.'}</p>
+        <h4 class="subtitle" style="margin-top: 1rem;">Episode Guide:</h4>
+        <div id="episodeListContainer" class="episode-list-container">
+          <div class="select">
+            <select id="episodeSelect">
+              ${animeData.episodes.map(episode => {
+                const watchedClass = isEpisodeWatched(animeData.id, episode.id) ? 'watched' : '';
+                const checkMark = isEpisodeWatched(animeData.id, episode.id) ? '✓ ' : '';
+                return `<option value="${episode.id}" class="${watchedClass}">${checkMark}Episode ${episode.number}</option>`;
+              }).join('')}
+            </select>
+          </div>
+          <button class="button is-primary play-class" onclick="playSelectedEpisode('${animeData.id}')">Play</button>
+        </div>
+        <div class="video-player" style="display: none;">
+          <video id="player" controls class="video"></video>
+        </div>
       </div>
-      <button class="button is-primary play-class" onclick="playSelectedEpisode('${animeData.id}')">Play</button>
-    </div>
-    <div class="video-player" style="display: none;">
-      <video id="player" controls class="video"></video>
     </div>
   `;
 
