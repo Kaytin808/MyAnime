@@ -76,13 +76,13 @@ function displayEpisodeGuide(animeData) {
       <div class="select">
         <select id="episodeSelect">
           ${animeData.episodes.map(episode => {
-            const watchedClass = isEpisodeWatched(animeData.id, episode.id) ? 'watched' : '';
-            const checkMark = isEpisodeWatched(animeData.id, episode.id) ? '✓ ' : '';
-            return `<option value="${episode.id}" class="${watchedClass}">${checkMark}Episode ${episode.number}</option>`;
-          }).join('')}
+    const watchedClass = isEpisodeWatched(animeData.id, episode.id) ? 'watched' : '';
+    const checkMark = isEpisodeWatched(animeData.id, episode.id) ? '✓ ' : '';
+    return `<option value="${episode.id}" class="${watchedClass}">${checkMark}Episode ${episode.number}</option>`;
+  }).join('')}
         </select>
       </div>
-      <button class="button is-primary" onclick="playSelectedEpisode('${animeData.id}')">Play</button>
+      <button class="button is-primary play-class" onclick="playSelectedEpisode('${animeData.id}')">Play</button>
     </div>
     <div class="video-player" style="display: none;">
       <video id="player" controls class="video"></video>
@@ -114,6 +114,17 @@ function playSelectedEpisode(animeId) {
   var selectElement = document.getElementById('episodeSelect');
   var selectedEpisodeId = selectElement.value;
 
+  var playBtn = document.querySelector("button.is-primary.play-class");
+
+  if (playBtn) {
+    // Remove the "is-primary" class and add the "is-loading" class
+    playBtn.classList.remove("is-primary");
+    playBtn.classList.add("is-loading");
+    playBtn.disabled = true; // Disable the button during loading
+  }
+
+  console.log(playBtn);
+
   // Save last episode selected
   markEpisodeAsWatched(animeId, selectedEpisodeId);
 
@@ -132,22 +143,31 @@ function playSelectedEpisode(animeId) {
       console.log('Episode Response:', data); // Log the response data
       var episodeUrl = data.sources[0].url;
       var videoPlayer = document.getElementById('player');
+
       videoPlayer.src = episodeUrl;
       videoPlayer.load();
-      videoPlayer.play(); // Play the episode
 
-      // Request fullscreen
-      if (videoPlayer.requestFullscreen) {
-        videoPlayer.requestFullscreen();
-      } else if (videoPlayer.mozRequestFullScreen) {
-        videoPlayer.mozRequestFullScreen();
-      } else if (videoPlayer.webkitRequestFullscreen) {
-        videoPlayer.webkitRequestFullscreen();
-      } else if (videoPlayer.msRequestFullscreen) {
-        videoPlayer.msRequestFullscreen();
-      }
+      videoPlayer.addEventListener('loadeddata', function() {
+        playBtn.classList.add("is-primary");
+        playBtn.classList.remove("is-loading");
+        playBtn.disabled = false;
+      });
+
+      // Revert the play button back to its normal state if an error occurs
+      videoPlayer.addEventListener('error', function() {
+        console.error('Error loading the video');
+        playBtn.classList.add("is-primary");
+        playBtn.classList.remove("is-loading");
+        playBtn.disabled = false;
+      });
+
+      videoPlayer.play(); // Play the episode
     })
     .catch(error => {
       console.error('Error:', error);
+      // Revert the play button back to its normal state if an error occurs
+      playBtn.classList.add("is-primary");
+      playBtn.classList.remove("is-loading");
+      playBtn.disabled = false;
     });
 }
