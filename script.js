@@ -28,6 +28,35 @@ function displayNoResults() {
   animeList.innerHTML = '<li class="box">Couldn\'t find that anime.</li>';
 }
 
+function displayFavorites() {
+  var favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+  var animeList = document.getElementById('animeList');
+  animeList.innerHTML = '';
+
+  if (favorites.length === 0) {
+    animeList.innerHTML = '<li class="box">No favorites added.</li>';
+  } else {
+    favorites.forEach(anime => {
+      var listItem = document.createElement('li');
+      listItem.className = 'box';
+      listItem.innerHTML = `
+        <strong>${anime.title}</strong>
+        <br>
+        <img src="${anime.image}" alt="${anime.title}" style="max-width: 200px;">
+        <br>
+        <button onclick="showEpisodeGuide('${anime.id}')" class="button is-primary is-rounded">
+          <span class="icon">
+            <i class="fas fa-play"></i>
+          </span>
+          <span>Watch Now</span>
+        </button>
+      `;
+
+      animeList.appendChild(listItem);
+    });
+  }
+}
+
 function displayAnimeResults(animeData) {
   var animeList = document.getElementById('animeList');
   animeList.innerHTML = '';
@@ -69,29 +98,47 @@ function showEpisodeGuide(animeId) {
     });
 }
 
+function addToFavorites(animeId, animeTitle, animeImage) {
+  var favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+  var favorite = { id: animeId, title: animeTitle, image: animeImage };
+
+  if (!favorites.some(fav => fav.id === animeId)) {
+    favorites.push(favorite);
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+    alert('Added to favorites!');
+  } else {
+    alert('Already in favorites!');
+  }
+}
+
 function displayEpisodeGuide(animeData) {
   var episodeGuide = document.createElement('div');
   episodeGuide.innerHTML = `
     <div class="card">
       <div class="card-content">
-        <h3 class="title">${animeData.title}</h3>
-        <img src="${animeData.image}" alt="${animeData.title}" style="max-width: 200px;">
-        <p>${animeData.description || 'No description available.'}</p>
-        <h4 class="subtitle" style="margin-top: 1rem;">Episode Guide:</h4>
-        <div id="episodeListContainer" class="episode-list-container">
-          <div class="select">
-            <select id="episodeSelect">
-              ${animeData.episodes.map(episode => {
-                const watchedClass = isEpisodeWatched(animeData.id, episode.id) ? 'watched' : '';
-                const checkMark = isEpisodeWatched(animeData.id, episode.id) ? '✓ ' : '';
-                return `<option value="${episode.id}" class="${watchedClass}">${checkMark}Episode ${episode.number}</option>`;
-              }).join('')}
-            </select>
+        <div class="episode-guide-content">
+          <div class="is-pulled-right has-text-warning" onclick="addToFavorites('${animeData.id}', '${animeData.title}', '${animeData.image}')">
+            <i class="fas fa-star favorite-star"></i>
           </div>
-          <button class="button is-primary play-class" onclick="playSelectedEpisode('${animeData.id}')">Play</button>
-        </div>
-        <div class="video-player" style="display: none;">
-          <video id="player" controls class="video"></video>
+          <h3 class="title">${animeData.title}</h3>
+          <img src="${animeData.image}" alt="${animeData.title}" style="max-width: 200px;">
+          <p>${animeData.description || 'No description available.'}</p>
+          <h4 class="subtitle" style="margin-top: 1rem;">Episode Guide:</h4>
+          <div id="episodeListContainer" class="episode-list-container">
+            <div class="select">
+              <select id="episodeSelect">
+                ${animeData.episodes.map(episode => {
+                  const watchedClass = isEpisodeWatched(animeData.id, episode.id) ? 'watched' : '';
+                  const checkMark = isEpisodeWatched(animeData.id, episode.id) ? '✓ ' : '';
+                  return `<option value="${episode.id}" class="${watchedClass}">${checkMark}Episode ${episode.number}</option>`;
+                }).join('')}
+              </select>
+            </div>
+            <button class="button is-primary play-class" onclick="playSelectedEpisode('${animeData.id}')">Play</button>
+          </div>
+          <div class="video-player" style="display: none;">
+            <video id="player" controls class="video"></video>
+          </div>
         </div>
       </div>
     </div>
