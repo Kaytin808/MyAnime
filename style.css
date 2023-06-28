@@ -3,9 +3,34 @@ body {
   margin: 0;
   padding: 0;
 }
+
+:root {
+  --plyr-color-main: #0080ff;
+  --plyr--video:
+    overflow: hidden;
+    width: 100%;
+  
+
+}
+
+.vid-container {
+  margin-top: 20px;
+  width: 90%;
+  /* display: flex; */
+  justify-content: center;
+  background-color: #2f2d2d;
+  margin-left: 64px;
+}
+
+#player {
+  --plyr-video-background: #000000;
+  --plyr--video :  width: 100%;
+}
+
 .episode-guide-content {
   position: relative;
 }
+
 header {
   background-color: #333;
   color: #5c5c5c;
@@ -22,7 +47,7 @@ h1 {
 
 .search-container input {
   padding: 8px;
-  width: 200px;
+  width: 10px;
 }
 
 .search-container button {
@@ -73,7 +98,7 @@ main {
   z-index: 1;
   background-color: #f9f9f9;
   min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
 }
 
 .animeCard .episode-dropdown a {
@@ -90,10 +115,11 @@ main {
 #playerContainer {
   margin-top: 20px;
 }
+
 .anime-description {
   max-height: 80px;
   overflow: hidden;
-   transition: max-height 0.3s ease;
+  transition: max-height 0.3s ease;
 }
 
 .anime-description.collapsed {
@@ -103,18 +129,177 @@ main {
 .button.is-small.is-rounded {
   margin-top: 20px;
 }
+
 .anime-description.collapsed p {
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
-  -webkit-line-clamp: 3; /* Adjust the number of lines to show by changing this value */
+  -webkit-line-clamp: 3;
+  /* Adjust the number of lines to show by changing this value */
   -webkit-box-orient: vertical;
 }
 
 .anime-description.expanded p {
   -webkit-line-clamp: initial;
 }
-.episode-guide-content{
+
+.episode-guide-content {
   margin-bottom: 10px;
+
+}
+
+#episodeListContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.subtitle {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+.title {
+  text-align: center;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  .episode-guide-content {
+    position: relative;
+  }
+  header {
+    background-color: #333;
+    color: #5c5c5c;
+    padding: 20px;
+  }
+  #videoFrame {
+    width: 640px;
+    height: 360px;
+    border: 1px solid #ccc;
+  }
+  #player {
+    width: 100%;
+    background-color: #333;
+  }
+  h1 {
+    margin: 0;
+  }
   
+  .search-container {
+    margin-top: 20px;
+  }
+  
+  .search-container input {
+    padding: 8px;
+    width: 200px;
+  }
+  
+  .search-container button {
+    padding: 8px 16px;
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+  }
+  
+  main {
+    padding: 20px;
+  }
+  
+  .animeCard {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    position: relative;
+  }
+  
+  .animeCard img {
+    width: 100%;
+    max-width: 200px;
+    height: auto;
+    margin-top: 10px;
+  }
+  
+  .animeCard .select-episode-btn {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 2;
+    padding: 8px 16px;
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .animeCard .episode-dropdown {
+    display: none;
+    position: absolute;
+    top: 40px;
+    left: 10px;
+    z-index: 1;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  }
+  
+  .animeCard .episode-dropdown a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+  }
+  
+  .animeCard:hover .episode-dropdown {
+    display: block;
+  }
+  
+  #playerContainer {
+    margin-top: 20px;
+  }
+  .anime-description {
+    max-height: 80px;
+    overflow: hidden;
+     transition: max-height 0.3s ease;
+  }
+  
+  .anime-description.collapsed {
+    max-height: none;
+  }
+  
+  .button.is-small.is-rounded {
+    margin-top: 20px;
+  }
+  .anime-description.collapsed p {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* Adjust the number of lines to show by changing this value */
+    -webkit-box-orient: vertical;
+  }
+  
+  .anime-description.expanded p {
+    -webkit-line-clamp: initial;
+  }
+  .episode-guide-content{
+    margin-bottom: 10px;
+    
+  }
+
+.select {
+  margin-right: 5px;
+}
+
+.img-container {
+  text-align: center;
+}
+
+@media only screen and (max-width: 428px) {
+  .vid-container {
+    margin-left: 0px;
+    width: auto;
+  }
 }

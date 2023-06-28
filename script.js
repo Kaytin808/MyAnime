@@ -1,3 +1,4 @@
+
 function returnToIndex() {
   window.location.href = 'index.html';
 }
@@ -22,6 +23,14 @@ function searchAnime() {
       });
   }
 }
+
+var searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('keydown', function(event) {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    searchAnime();
+  }
+});
 
 function displayNoResults() {
   var animeList = document.getElementById('animeList');
@@ -73,12 +82,12 @@ function displayAnimeResults(animeData) {
       <br>
       <strong>Sub/Dub:</strong> ${anime.subOrDub === 'sub' ? 'Subbed' : 'Dubbed'}
       <br>
-   <button onclick="showEpisodeGuide('${anime.id}')" class="button is-primary is-rounded">
-  <span class="icon">
-    <i class="fas fa-play"></i>
-  </span>
-  <span>Watch Now</span>
-</button>
+      <button onclick="showEpisodeGuide('${anime.id}')" class="button is-primary is-rounded">
+        <span class="icon">
+          <i class="fas fa-play"></i>
+        </span>
+        <span>Watch Now</span>
+      </button>
     `;
 
     animeList.appendChild(listItem);
@@ -113,6 +122,8 @@ function addToFavorites(animeId, animeTitle, animeImage) {
 
 function displayEpisodeGuide(animeData) {
   var episodeGuide = document.createElement('div');
+  const qualityOptions = ['360', '480p', '720p', '1080p']; // Add the desired quality options
+
   episodeGuide.innerHTML = `
     <div class="card">
       <div class="card-content">
@@ -121,23 +132,29 @@ function displayEpisodeGuide(animeData) {
             <i class="fas fa-star favorite-star"></i>
           </div>
           <h3 class="title">${animeData.title}</h3>
-          <img src="${animeData.image}" alt="${animeData.title}" style="max-width: 200px;">
+          <div class = "img-container">
+            <img src="${animeData.image}" alt="${animeData.title}" style="max-width: 200px;">
+          </div>
           <p>${animeData.description || 'No description available.'}</p>
           <h4 class="subtitle" style="margin-top: 1rem;">Episode Guide:</h4>
           <div id="episodeListContainer" class="episode-list-container">
             <div class="select">
               <select id="episodeSelect">
-                ${animeData.episodes.map(episode => {
-                  const watchedClass = isEpisodeWatched(animeData.id, episode.id) ? 'watched' : '';
-                  const checkMark = isEpisodeWatched(animeData.id, episode.id) ? '✓ ' : '';
-                  return `<option value="${episode.id}" class="${watchedClass}">${checkMark}Episode ${episode.number}</option>`;
-                }).join('')}
+                ${animeData.episodes
+      .map(episode => {
+        const watchedClass = isEpisodeWatched(animeData.id, episode.id) ? 'watched' : '';
+        const checkMark = isEpisodeWatched(animeData.id, episode.id) ? '✓ ' : '';
+        return `<option value="${episode.id}" class="${watchedClass}">${checkMark}Episode ${episode.number}</option>`;
+      })
+      .join('')}
               </select>
             </div>
             <button class="button is-primary play-class" onclick="playSelectedEpisode('${animeData.id}')">Play</button>
           </div>
-          <div class="video-player" style="display: none;">
-            <video id="player" controls class="video"></video>
+          <div class="vid-container">
+   <video id="player" playsinline controls>
+   
+   </video>
           </div>
         </div>
       </div>
@@ -168,13 +185,14 @@ function markEpisodeAsWatched(animeId, episodeId) {
 function playSelectedEpisode(animeId) {
   var selectElement = document.getElementById('episodeSelect');
   var selectedEpisodeId = selectElement.value;
+  const player = document.getElementById('player');
 
-  var playBtn = document.querySelector("button.is-primary.play-class");
+  var playBtn = document.querySelector('button.is-primary.play-class');
 
   if (playBtn) {
     // Remove the "is-primary" class and add the "is-loading" class
-    playBtn.classList.remove("is-primary");
-    playBtn.classList.add("is-loading");
+    playBtn.classList.remove('is-primary');
+    playBtn.classList.add('is-loading');
     playBtn.disabled = true; // Disable the button during loading
   }
 
@@ -196,33 +214,75 @@ function playSelectedEpisode(animeId) {
     .then(response => response.json())
     .then(data => {
       console.log('Episode Response:', data); // Log the response data
-      var episodeUrl = data.sources[0].url;
-      var videoPlayer = document.getElementById('player');
+      var episodeUrl = data.sources[4].url;
 
-      videoPlayer.src = episodeUrl;
-      videoPlayer.load();
+      const playerVid = new Plyr('#player', {
+        controls: ['play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen'],
+        settings: ['captions', 'quality', 'speed', 'loop'],
+        quality: {
+          default: 720,
+          options: [720, 480, 360]
+        }
+      });
 
-      videoPlayer.addEventListener('loadeddata', function() {
-        playBtn.classList.add("is-primary");
-        playBtn.classList.remove("is-loading");
+      if (!Hls.isSupported()) {
+        playerVid.src = episodeUrl;
+      } else {
+        // For more Hls.js options, see https://github.com/dailymotion/hls.js
+        const hls = new Hls();
+        hls.loadSource(episodeUrl);
+        hls.attachMedia(player);
+        window.hls = hls;
+      }
+
+      player.load();
+
+
+
+      player.addEventListener('loadeddata', function() {
+        playBtn.classList.add('is-primary');
+        playBtn.classList.remove('is-loading');
         playBtn.disabled = false;
       });
 
       // Revert the play button back to its normal state if an error occurs
-      videoPlayer.addEventListener('error', function() {
+      player.addEventListener('error', function() {
         console.error('Error loading the video');
-        playBtn.classList.add("is-primary");
-        playBtn.classList.remove("is-loading");
+        playBtn.classList.add('is-primary');
+        playBtn.classList.remove('is-loading');
         playBtn.disabled = false;
       });
 
-      videoPlayer.play(); // Play the episode
+      player.play(); // Play the episode
+
+      if (isMobileDevice()) {
+        requestFullscreen(player);
+      }
     })
     .catch(error => {
       console.error('Error:', error);
       // Revert the play button back to its normal state if an error occurs
-      playBtn.classList.add("is-primary");
-      playBtn.classList.remove("is-loading");
+      playBtn.classList.add('is-primary');
+      playBtn.classList.remove('is-loading');
       playBtn.disabled = false;
     });
 }
+
+function isMobileDevice() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+function requestFullscreen(element) {
+  if (element.requestFullscreen) {
+    element.requestFullscreen();
+  } else if (element.mozRequestFullScreen) {
+    element.mozRequestFullScreen();
+  } else if (element.webkitRequestFullscreen) {
+    element.webkitRequestFullscreen();
+  } else if (element.msRequestFullscreen) {
+    element.msRequestFullscreen();
+  }
+}
+
+// Check for syntax errors
+console.log('No syntax errors.');

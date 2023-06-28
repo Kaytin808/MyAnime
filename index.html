@@ -1,17 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
   <link rel="stylesheet" href="style.css" />
-  
+  <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+
   <title>Anime Search Engine</title>
 </head>
+
 <body>
   <section class="section">
-    <div class="container"><h2 class="title is-2 has-text-centered" onclick="returnToIndex()">myAnime<i class="fas fa-heart" style="color: red;"></i></h2>
+    <div class="container">
+      <h2 class="title is-2 has-text-centered" onclick="returnToIndex()">myAnime<i class="fas fa-heart"
+          style="color: red;"></i></h2>
       <div class="field has-addons">
         <div class="control is-expanded">
           <input class="input" type="text" id="searchInput" placeholder="Enter an anime title">
@@ -21,18 +26,23 @@
         </div>
       </div>
 
-          <div class="field is-grouped is-grouped-centered">
-      <div class="control">
-       <button class="button is-primary is-rounded" onclick="displayFavorites()">Favorites</button>
+      <div class="field is-grouped is-grouped-centered">
+        <div class="control">
+          <button class="button is-primary is-rounded" onclick="displayFavorites()">Favorites</button>
+        </div>
       </div>
-    </div>
       <ul id="animeList"></ul>
     </div>
   </section>
-
-    <script src="script.js">
-     
+  <script src="https://cdn.plyr.io/3.7.2/plyr.polyfilled.js"></script>
+  <!-- HLS Support for streaming-->
+  <script src="https://cdn.rawgit.com/video-dev/hls.js/18bb552/dist/hls.min.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js">
   </script>
+
+  <script src="script.js">
+  </script>
+
 </body>
-  
+
 </html>
