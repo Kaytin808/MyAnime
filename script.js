@@ -1,4 +1,3 @@
-
 function returnToIndex() {
   window.location.href = 'index.html';
 }
@@ -141,20 +140,19 @@ function displayEpisodeGuide(animeData) {
             <div class="select">
               <select id="episodeSelect">
                 ${animeData.episodes
-      .map(episode => {
-        const watchedClass = isEpisodeWatched(animeData.id, episode.id) ? 'watched' : '';
-        const checkMark = isEpisodeWatched(animeData.id, episode.id) ? '✓ ' : '';
-        return `<option value="${episode.id}" class="${watchedClass}">${checkMark}Episode ${episode.number}</option>`;
-      })
-      .join('')}
+                  .map(episode => {
+                    const watchedClass = isEpisodeWatched(animeData.id, episode.id) ? 'watched' : '';
+                    const checkMark = isEpisodeWatched(animeData.id, episode.id) ? '✓ ' : '';
+                    return `<option value="${episode.id}" class="${watchedClass}">${checkMark}Episode ${episode.number}</option>`;
+                  })
+                  .join('')}
               </select>
             </div>
             <button class="button is-primary play-class" onclick="playSelectedEpisode('${animeData.id}')">Play</button>
           </div>
           <div class="vid-container">
-   <video id="player" playsinline controls>
-   
-   </video>
+            <video id="player" playsinline controls>
+            </video>
           </div>
         </div>
       </div>
@@ -186,7 +184,6 @@ function playSelectedEpisode(animeId) {
   var selectElement = document.getElementById('episodeSelect');
   var selectedEpisodeId = selectElement.value;
   const player = document.getElementById('player');
-
   var playBtn = document.querySelector('button.is-primary.play-class');
 
   if (playBtn) {
@@ -195,8 +192,6 @@ function playSelectedEpisode(animeId) {
     playBtn.classList.add('is-loading');
     playBtn.disabled = true; // Disable the button during loading
   }
-
-  console.log(playBtn);
 
   // Save last episode selected
   markEpisodeAsWatched(animeId, selectedEpisodeId);
@@ -216,47 +211,10 @@ function playSelectedEpisode(animeId) {
       console.log('Episode Response:', data); // Log the response data
       var episodeUrl = data.sources[4].url;
 
-      const playerVid = new Plyr('#player', {
-        controls: ['play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen'],
-        settings: ['captions', 'quality', 'speed', 'loop'],
-        quality: {
-          default: 720,
-          options: [720, 480, 360]
-        }
-      });
-
-      if (!Hls.isSupported()) {
-        playerVid.src = episodeUrl;
-      } else {
-        // For more Hls.js options, see https://github.com/dailymotion/hls.js
-        const hls = new Hls();
-        hls.loadSource(episodeUrl);
-        hls.attachMedia(player);
-        window.hls = hls;
-      }
-
-      player.load();
-
-
-
-      player.addEventListener('loadeddata', function() {
-        playBtn.classList.add('is-primary');
-        playBtn.classList.remove('is-loading');
-        playBtn.disabled = false;
-      });
-
-      // Revert the play button back to its normal state if an error occurs
-      player.addEventListener('error', function() {
-        console.error('Error loading the video');
-        playBtn.classList.add('is-primary');
-        playBtn.classList.remove('is-loading');
-        playBtn.disabled = false;
-      });
-
-      player.play(); // Play the episode
-
       if (isMobileDevice()) {
-        requestFullscreen(player);
+        playMobileEpisode(episodeUrl);
+      } else {
+        playPCEpisode(episodeUrl);
       }
     })
     .catch(error => {
@@ -282,6 +240,44 @@ function requestFullscreen(element) {
   } else if (element.msRequestFullscreen) {
     element.msRequestFullscreen();
   }
+}
+
+function playMobileEpisode(episodeUrl) {
+  var player = document.getElementById('player');
+  player.src = episodeUrl;
+  player.play();
+  requestFullscreen(player);
+}
+
+function playPCEpisode(episodeUrl) {
+  const playerVid = new Plyr('#player', {
+    controls: ['play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen'],
+    settings: ['captions', 'quality', 'speed', 'loop'],
+    quality: {
+      default: 720,
+      options: [720, 480, 360],
+    },
+  });
+
+  if (!Hls.isSupported()) {
+    playerVid.source = {
+      type: 'video',
+      sources: [
+        {
+          src: episodeUrl,
+          type: 'video/mp4',
+          size: 720,
+        },
+      ],
+    };
+  } else {
+    const hls = new Hls();
+    hls.loadSource(episodeUrl);
+    hls.attachMedia(playerVid.media);
+    window.hls = hls;
+  }
+
+  playerVid.play();
 }
 
 // Check for syntax errors
