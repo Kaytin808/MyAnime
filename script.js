@@ -186,12 +186,9 @@ function playSelectedEpisode(animeId) {
   const player = document.getElementById('player');
   var playBtn = document.querySelector('button.is-primary.play-class');
 
-  if (playBtn) {
-    // Remove the "is-primary" class and add the "is-loading" class
-    playBtn.classList.remove('is-primary');
-    playBtn.classList.add('is-loading');
-    playBtn.disabled = true; // Disable the button during loading
-  }
+  // Reset the button state and show loading animation
+  playBtn.classList.add('is-loading');
+  playBtn.disabled = true;
 
   // Save last episode selected
   markEpisodeAsWatched(animeId, selectedEpisodeId);
@@ -214,17 +211,18 @@ function playSelectedEpisode(animeId) {
       if (isMobileDevice()) {
         playMobileEpisode(episodeUrl);
       } else {
-        playPCEpisode(episodeUrl);
+        playPCEpisode(episodeUrl, playBtn); // Pass the play button as an argument
       }
     })
     .catch(error => {
       console.error('Error:', error);
-      // Revert the play button back to its normal state if an error occurs
-      playBtn.classList.add('is-primary');
+      // Revert the button back to its normal state if an error occurs
       playBtn.classList.remove('is-loading');
       playBtn.disabled = false;
     });
 }
+
+
 
 function isMobileDevice() {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -249,7 +247,7 @@ function playMobileEpisode(episodeUrl) {
   requestFullscreen(player);
 }
 
-function playPCEpisode(episodeUrl) {
+function playPCEpisode(episodeUrl, playBtn) {
   const playerVid = new Plyr('#player', {
     controls: ['play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen'],
     settings: ['captions', 'quality', 'speed', 'loop'],
@@ -278,7 +276,12 @@ function playPCEpisode(episodeUrl) {
   }
 
   playerVid.play();
+
+  // Remove the "is-loading" class and re-enable the button
+  playBtn.classList.remove('is-loading');
+  playBtn.disabled = false;
 }
+
 
 // Check for syntax errors
 console.log('No syntax errors.');
