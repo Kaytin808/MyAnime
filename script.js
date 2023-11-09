@@ -228,36 +228,48 @@ function isMobileDevice() {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
 
-function requestFullscreen(element) {
-  if (element.requestFullscreen) {
-    element.requestFullscreen();
-  } else if (element.mozRequestFullScreen) {
-    element.mozRequestFullScreen();
-  } else if (element.webkitRequestFullscreen) {
-    element.webkitRequestFullscreen();
-  } else if (element.msRequestFullscreen) {
-    element.msRequestFullscreen();
-  }
-}
+// function requestFullscreen(element) {
+//   if (element.requestFullscreen) {
+//     element.requestFullscreen();
+//   } else if (element.mozRequestFullScreen) {
+//     element.mozRequestFullScreen();
+//   } else if (element.webkitRequestFullscreen) {
+//     element.webkitRequestFullscapplication/vnd.apple.mpegurlreen();
+//   } else if (element.msRequestFullscreen) {
+//     element.msRequestFullscreen();
+//   }
+// }
 
 function playMobileEpisode(episodeUrl) {
   var player = document.getElementById('player');
   player.src = episodeUrl;
   player.play();
-  requestFullscreen(player);
+  playBtn.classList.remove('is-loading');
+  playBtn.disabled = false;
+  // requestFullscreen(player);
 }
 
 function playPCEpisode(episodeUrl, playBtn) {
   const playerVid = new Plyr('#player', {
     controls: ['play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen'],
     settings: ['captions', 'quality', 'speed', 'loop'],
-    quality: {
-      default: 720,
-      options: [720, 480, 360],
-    },
   });
 
-  if (!Hls.isSupported()) {
+  const hls = new Hls();
+
+  if (Hls.isSupported()) {
+    hls.loadSource(episodeUrl);
+    hls.attachMedia(playerVid.media);
+
+    hls.on(Hls.Events.ERROR, (event, data) => {
+      console.error(`HLS.js Error: ${data.details}`);
+      // You can handle the error here, e.g., display an error message to the user.
+    });
+
+    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+      playerVid.play();
+    });
+  } else {
     playerVid.source = {
       type: 'video',
       sources: [
@@ -268,19 +280,20 @@ function playPCEpisode(episodeUrl, playBtn) {
         },
       ],
     };
-  } else {
-    const hls = new Hls();
-    hls.loadSource(episodeUrl);
-    hls.attachMedia(playerVid.media);
-    window.hls = hls;
-  }
 
-  playerVid.play();
+    playerVid.on('error', event => {
+      console.error(`Plyr Error: ${event.detail.message}`);
+      // You can handle the error here, e.g., display an error message to the user.
+    });
+
+    playerVid.play();
+  }
 
   // Remove the "is-loading" class and re-enable the button
   playBtn.classList.remove('is-loading');
   playBtn.disabled = false;
 }
+
 
 
 // Check for syntax errors
